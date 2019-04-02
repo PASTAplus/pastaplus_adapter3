@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+""":Mod: properties.py
+
+:Synopsis:
+ 
+:Author:
+    servilla
+
+:Created:
+    3/8/17
+"""
+
+import logging
+
+
+logger = logging.getLogger('properties.py')
+
+# URLs
+PASTA_BASE_URL = u'https://pasta-s.lternet.edu/package/'
+D1_BASE_URL = u'https://cn-stage.test.dataone.org/cn'
+GMN_BASE_URL = u'https://gmn-s.edirepository.org/mn'
+
+# Credentials
+GMN_USER = u'uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org'
+GMN_PASSWD = u'SECRET_PASSWORD'
+GMN_CERT_PATH = u'GMN_CERT_PATH'
+GMN_KEY_PATH = u'GMN_KEY_PATH'
+
+# Resource types
+PACKAGE = u'package'
+METADATA = u'metadata'
+DATA = u'data'
+REPORT = u'report'
+ORE = u'ore'
+
+# Resource URL patterns
+PACKAGE_PATTERN = u'/package/eml'
+METADATA_PATTERN = u'/package/metadata/eml'
+DATA_PATTERN = u'/package/data/eml'
+REPORT_PATTERN = u'/package/report/eml'
+
+# PASTA environments
+PRODUCTION = u'pasta.lternet.edu'
+STAGING = u'pasta-s.lternet.edu'
+DEVELOPMENT = u'pasta-d.lternet.edu'
+
+# PASTA method types
+CREATE = u'createDataPackage'
+UPDATE = u'updateDataPackage'
+DELETE = u'deleteDataPackage'
+
+# Miscellaneous
+CHECKSUM_ALGORITHM = u'SHA-1'
+DEFAULT_RIGHTS_HOLDER = u'CN=PASTA-GMN,O=EDI,ST=New Mexico,C=US'
+PASTA_WHITELIST = {'edi'}
+GMN_RESPONSE_TIMEOUT = 3 * 60
+SCOPE = u'edi'
+VERIFY_TLS = True
+
+# Files
+QUEUE = u'adapter_queue.sqlite'
+FORMATS = u'formats.pkl'
+
+# Polling from/to dates
+FROM_DATE = u'2013-01-01T00:00:00.00'
+
+def main():
+    return 0
+
+
+if __name__ == "__main__":
+    main()

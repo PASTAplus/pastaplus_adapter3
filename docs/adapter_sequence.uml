@@ -1,0 +1,26 @@
+@startuml
+
+entity PASTA
+participant poll_manager
+database poll_queue
+participant package_manager
+entity GMN
+
+poll_manager->PASTA: get_recent_changes()
+PASTA->poll_manager: recent_changes_xml
+
+loop parse(recent_changes_xml)
+poll_manager->poll_queue: package_info
+end
+
+...
+
+loop iterate(recent_changes)
+package_manager->poll_queue: read_package_info
+package_manager->PASTA: get_package_components()
+package_manager->package_manager: build_package()
+package_manager->GMN: data_package
+end
+
+
+@enduml

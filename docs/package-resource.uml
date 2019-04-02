@@ -1,0 +1,18 @@
+@startuml
+
+ResourceBase <|-- ResourceMetadata
+ResourceBase <|-- ResourceReport
+ResourceBase <|-- ResourceData
+ResourceBase <|-- ResourceORE
+
+Package *-- "1" ResourceMetadata
+Package *-- "1" ResourceReport
+Package *-- "1..*" ResourceData
+Package *-- "1" ResourceORE
+
+ResourceMetadata -- "1" SysMeta
+ResourceReport -- "1" SysMeta
+ResourceData -- "1" SysMeta
+ResourceORE -- "1" SysMeta
+
+@enduml
