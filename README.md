@@ -1,2 +1,3 @@
-# pastaplus_adapter3
-DataONE Generic Member Node adapter for the PASTAplus data repository using Python3
+# PASTAplus Adapter Python3
+
+The PASTAplus Adapter (adapter, here after) is a DataONE slender node bridge between the DataONE Generic Member Node (GMN) and the PASTAplus data repository. The adapter itself operates in two phases: the first phase polls PASTA for recent additions, updates, or deletions of data packages in the reopsitory -- this information is written to a common data queue in the form of data package identifier and an event timestamp; the second phase of the adapter reads the queue for new event information and performs a create, update, or deletion (archive) of all objects associated with each data package.
