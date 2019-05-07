@@ -15,7 +15,8 @@ from __future__ import print_function
 """
 
 import logging
-import StringIO
+from io import BytesIO
+import time
 
 
 # Set level to WARN to avoid verbosity in requests at INFO
@@ -64,10 +65,11 @@ def gmn_create(resource=None):
     gmn_client = create_gmn_client()
     try:
         gmn_client.create(pid=resource.identifier,
-                          obj=StringIO.StringIO(resource.object),
+                          obj=BytesIO(resource.object),
                           sysmeta_pyxb=resource.get_d1_sys_meta(),
                           vendorSpecific=resource.vendor_specific_header)
     except Exception as e:
+        logger.debug('gmn_create exception - pid={} object={}'.format(resource.identifier, resource.object))
         logger.error(e)
 
 
@@ -76,7 +78,7 @@ def gmn_update(resource=None):
     gmn_client = create_gmn_client()
     try:
         gmn_client.update(pid=resource.predecessor,
-                          obj=StringIO.StringIO(resource.object),
+                          obj=BytesIO(resource.object),
                           newPid = resource.identifier,
                           sysmeta_pyxb=resource.get_d1_sys_meta(),
                           vendorSpecific=resource.vendor_specific_header)
@@ -92,6 +94,16 @@ def gmn_archive(resource=None):
         gmn_client.archive(pid=resource.identifier)
     except Exception as e:
         logger.error(e)
+
+
+def gmn_exists(pid=None):
+    gmn_client = create_gmn_client()
+    try:
+        r = gmn_client.getChecksum(pid)
+    except Exception as e:
+        logger.error(e)
+        return False
+    return True
 
 
 def process_create_package(package=None):
@@ -161,24 +173,33 @@ def main():
     head = qm.get_head()
     while head is not None:
         logger.warn('Active package: {p}'.format(p=head.package))
-        p = Package(head)
-        if p.public:
-            logger.warn('Processing: {p}'.format(p=p.package))
-            if p.method == properties.CREATE:
-                process_create_package(package=p)
-            elif p.method == properties.UPDATE:
-                process_update_package(package=p, queue_manager=qm)
-            elif p.method == properties.DELETE:
-                process_archive_package(package=p)
-            else:
-                msg = 'Unrecognized package event "{event}" for' \
-                      'package: {package}'.format(event=p.method,
-                                                  package=p.package)
-                raise(AdapterIncompleteStateException(msg))
+        skip = False
+        if properties.CHECK_PRE_EXISTENCE_IN_GMN and head.method in [properties.CREATE, properties.UPDATE]:
+            skip = gmn_exists(properties.PASTA_BASE_URL + 'metadata/eml/' + head.package.replace('.', '/'))
+        if skip:
+            logger.warn('Package already exists: {}. Skipping {}.'.format(head.package, head.method))
         else:
-            logger.warn('Package not public: {p}'.format(p=p.package))
-
-        qm.dequeue(package=p.package, method=p.method)
+            p = Package(head)
+            if p.public:
+                logger.warn('Processing: {p}'.format(p=p.package))
+                resource = p.resources[properties.METADATA]
+                if p.method == properties.CREATE:
+                    process_create_package(package=p)
+                elif p.method == properties.UPDATE:
+                    process_update_package(package=p, queue_manager=qm)
+                elif p.method == properties.DELETE:
+                    process_archive_package(package=p)
+                else:
+                    msg = 'Unrecognized package event "{event}" for' \
+                          'package: {package}'.format(event=p.method,
+                                                      package=p.package)
+                    raise(AdapterIncompleteStateException(msg))
+            else:
+                logger.warn('Package not public: {p}'.format(p=p.package))
+        
+        qm.dequeue(package=head.package, method=head.method)
+        if properties.SLEEP_BETWEEN_PACKAGES:
+            time.sleep(int(properties.SLEEP_BETWEEN_PACKAGES))
         head = qm.get_head()
 
     logger.warn('Queue empty')

@@ -267,7 +267,7 @@ def _build_ore(pid=None, resources=None):
         data.append(data_resource.identifier)
 
     ore = d1_common.resource_map.ResourceMap(base_url=properties.D1_BASE_URL)
-    ore.oreInitialize(pid=pid)
+    ore.initialize(pid=pid)
     ore.addMetadataDocument(pid=resources[properties.METADATA].identifier)
     ore.addDataDocuments(scidata_pid_list=data, scimeta_pid=resources[properties.METADATA].identifier)
     return ore.serialize()

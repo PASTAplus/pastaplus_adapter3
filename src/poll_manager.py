@@ -38,15 +38,15 @@ def bootstrap(url=None):
     fromDate = datetime.strptime(properties.FROM_DATE,
                                  '%Y-%m-%dT%H:%M:%S.%f')
     while fromDate < now:
-        toDate = fromDate + timedelta(days=1)
+        toDate = fromDate + timedelta(minutes=30)
         fromDate_str = fromDate.strftime('%Y-%m-%dT%H:%M:%S.%f')
         toDate_str = toDate.strftime('%Y-%m-%dT%H:%M:%S.%f')
         logger.warn('from: {f} -- to: {t}'.format(f=fromDate_str, t=toDate_str))
-        parse(url=url, fromDate=fromDate_str, toDate=toDate_str)
+        parse(url=url, fromDate=fromDate_str, toDate=toDate_str, scope=properties.SCOPE)
         fromDate = toDate
 
 
-def parse(url=None, fromDate=None, toDate=None, scope=properties.SCOPE):
+def parse(url=None, fromDate=None, toDate=None, scope=None):
     """
     Parse the PASTA list of changes XML based on the query parameters provided
      
@@ -63,7 +63,6 @@ def parse(url=None, fromDate=None, toDate=None, scope=properties.SCOPE):
         url = url + 'toDate=' + toDate + '&'
     if scope is not None:
         url = url + 'scope=' + scope
-
 
     r = adapter_utilities.requests_get_url_wrapper(url=url)
 
@@ -122,7 +121,7 @@ def main():
     if fromDate is None:
         bootstrap(url=url)
     else:
-        parse(url=url, fromDate=fromDate)
+        parse(url=url, fromDate=fromDate, scope=properties.SCOPE)
 
     lock.release()
     logger.warn('Lock file {} released'.format(lock.lock_file))

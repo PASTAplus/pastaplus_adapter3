@@ -54,10 +54,25 @@ DELETE = u'deleteDataPackage'
 # Miscellaneous
 CHECKSUM_ALGORITHM = u'SHA-1'
 DEFAULT_RIGHTS_HOLDER = u'CN=PASTA-GMN,O=EDI,ST=New Mexico,C=US'
-PASTA_WHITELIST = {'edi'}
+##########
+# For EDI MN:
+#PASTA_WHITELIST = {'edi'}
+#SCOPE = u'edi'
+##########
+# For LTER MN:
+PASTA_WHITELIST = {'ecotrends', 'knb-lter-and', 'knb-lter-arc', 'knb-lter-bes', 'knb-lter-bnz',
+                   'knb-lter-cap', 'knb-lter-cce', 'knb-lter-cdr', 'knb-lter-cwt', 'knb-lter-fce',
+                   'knb-lter-gce', 'knb-lter-hbr', 'knb-lter-hfr', 'knb-lter-jrn', 'knb-lter-kbs',
+                   'knb-lter-knz', 'knb-lter-luq', 'knb-lter-mcm', 'knb-lter-mcr', 'knb-lter-nes',
+                   'knb-lter-nin', 'knb-lter-ntl', 'knb-lter-nwk', 'knb-lter-nwt', 'knb-lter-pal',
+                   'knb-lter-pie', 'knb-lter-sbc', 'knb-lter-sev', 'knb-lter-sgs', 'knb-lter-vcr',
+                   'lter-landsat', 'lter-landsat-ledaps', 'msb-cap', 'msb-paleon'}
+SCOPE = None
+##########
 GMN_RESPONSE_TIMEOUT = 3 * 60
-SCOPE = u'edi'
 VERIFY_TLS = True
+CHECK_PRE_EXISTENCE_IN_GMN = False  # Set to True when bootstrapping queue with existing packages 
+SLEEP_BETWEEN_PACKAGES = 5  # Number of seconds to pause between packages in package_manager
 
 # Files
 QUEUE = u'adapter_queue.sqlite'
