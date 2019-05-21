@@ -101,6 +101,14 @@ class ResourceBase(object):
     def acl(self, a):
         self._acl = a
 
+    @property
+    def replication_policy(self):
+        return self._replication_policy
+
+    @replication_policy.setter
+    def replication_policy(self, rp):
+        self._replication_policy = rp
+ 
     def get_d1_sys_meta(self):
         """
         Return a D1 system metadata object for the given resource as pyxb

@@ -15,6 +15,9 @@
 """
 
 import logging
+import xml.etree.ElementTree as ET
+import d1_common.types
+import d1_common.xml
 
 from adapter_exceptions import AdapterIncompleteStateException
 import adapter_utilities
@@ -37,7 +40,7 @@ class Package(object):
         self._package = event.package.strip()
         self._scope, self._identifier, self._revision = self._package.split('.')
         self._package_path = self._package.replace('.', '/')
-        self._resources = _build_resource_list(self.package_url, self._owner,
+        self._resources = _build_resource_list(self.eml_url, self.package_url, self._owner,
                                                self._doi)
         self._public = _assert_package_is_public(self._resources)
 
@@ -68,6 +71,10 @@ class Package(object):
     @property
     def package_url(self):
         return properties.PASTA_BASE_URL + 'eml/' + self._package_path
+
+    @property
+    def eml_url(self):
+        return properties.PASTA_BASE_URL + 'metadata/eml/' + self._package_path
 
     @property
     def package(self):
@@ -126,7 +133,32 @@ def _assert_resource_is_public(resource_url):
     return public
 
 
-def _build_resource_list(package_map_url, principal_owner, doi):
+def _get_replication_policy(eml_url=None):
+    r = adapter_utilities.requests_get_url_wrapper(url=eml_url)
+    if r is not None:
+        NAMESPACE_DICT = {
+            'eml': 'eml://ecoinformatics.org/eml-2.1.1',
+            'd1v1': 'http://ns.dataone.org/service/types/v1'
+        }
+        tree = ET.ElementTree(ET.fromstring(r.text))
+        root = tree.getroot()
+        replicationPolicy_list = root.findall(
+            "additionalMetadata/metadata/d1v1:replicationPolicy", NAMESPACE_DICT)
+        if len(replicationPolicy_list):
+            return ET.tostring(replicationPolicy_list[0]).decode('utf-8')
+    else:
+        return None
+
+
+def _generate_replication_policy(d1_replication_policy):
+    if d1_replication_policy is None:
+      return None
+    return d1_common.types.dataoneTypes.CreateFromDocument(
+      d1_replication_policy
+    )
+
+
+def _build_resource_list(eml_url, package_map_url, principal_owner, doi):
     """
     Return a dict of data package resources without the reflexive package
     resource.
@@ -141,23 +173,31 @@ def _build_resource_list(package_map_url, principal_owner, doi):
                  properties.DATA: []}
 
     package_acl = None
+    replication_policy = _get_replication_policy(eml_url)
+    if replication_policy is not None:
+        replication_policy = _generate_replication_policy(replication_policy)
+
     url = package_map_url
     r = adapter_utilities.requests_get_url_wrapper(url=url)
     resource_urls = r.text.split()
     for resource_url in resource_urls:
         if properties.METADATA_PATTERN in resource_url:
             rm = ResourceMetadata(url=resource_url, owner=principal_owner)
+            rm.replication_policy = replication_policy
             resources[properties.METADATA] = rm
             package_acl = rm.acl
         elif properties.REPORT_PATTERN in resource_url:
             rr = ResourceReport(url=resource_url, owner=principal_owner)
+            rr.replication_policy = replication_policy
             resources[properties.REPORT] = rr
         elif properties.DATA_PATTERN in resource_url:
             rd = ResourceData(url=resource_url, owner=principal_owner)
+            rd.replication_policy = replication_policy
             resources[properties.DATA].append(rd)
 
     ro = ResourceOre(doi=doi, owner=principal_owner, resources=resources)
     ro.acl = package_acl # Assign ORE same ACL as metadata/package ACL
+    ro.replication_policy = replication_policy
     resources[properties.ORE] = ro
 
     return resources

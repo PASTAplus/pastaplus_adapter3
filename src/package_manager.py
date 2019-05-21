@@ -23,8 +23,6 @@ import time
 logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S%z', level=logging.WARN)
 
-import xml.etree.ElementTree as ET
-
 import d1_client.cnclient_2_0
 import d1_client.mnclient_2_0
 
@@ -45,19 +43,6 @@ def create_gmn_client():
         cert_key_path=properties.GMN_KEY_PATH,
         verify_tls=properties.VERIFY_TLS
     )
-
-
-def get_replication_policy(eml_xml=None):
-    NAMESPACE_DICT = {
-        'eml': 'eml://ecoinformatics.org/eml-2.1.1',
-        'd1v1': 'http://ns.dataone.org/service/types/v1'
-    }
-    tree = ET.ElementTree(ET.fromstring(eml_xml))
-    root = tree.getroot()
-    replicationPolicy_list = root.findall(
-        "additionalMetadata/metadata/d1v1:replicationPolicy", NAMESPACE_DICT)
-    if len(replicationPolicy_list):
-        return ET.tostring(replicationPolicy_list[0])
 
 
 def gmn_create(resource=None):
