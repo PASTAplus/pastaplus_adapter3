@@ -14,6 +14,7 @@
 
 import logging
 import pickle
+import os
 import os.path
 from datetime import datetime
 from datetime import timedelta
@@ -22,13 +23,13 @@ import d1_client.cnclient_2_0
 import requests
 
 import properties
-
+from adapter_exceptions import AdapterRequestFailureException
 
 logger = logging.getLogger('adapter_utilities')
 logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S%z',
                     # filename='$NAME' + '.log',
-                    level=logging.INFO)
+                    level=logging.WARN)
 
 def _is_stale_file(filename=None, seconds=None):
     is_stale = False
@@ -82,7 +83,7 @@ def make_https(url=None):
     return url.replace('http:', 'https:', 1)
 
 
-def requests_get_url_wrapper(url=None, auth=None):
+def requests_get_url_wrapper(url=None, auth=None, rethrow=False):
     r = None
     try:
         r = requests.get(url=url, auth=auth)
@@ -92,4 +93,48 @@ def requests_get_url_wrapper(url=None, auth=None):
             r = None
     except Exception as e:
         logger.error(e)
+        if rethrow:
+            raise AdapterRequestFailureException
     return r
+
+
+def save_last_query_date(query_date=None):
+    # number of minutes to subtract from query_date
+    # we provide a generous amount of "slop" to allow for the possibility that PASTA's clock isn't
+    #   synced perfectly with ours
+    # it doesn't hurt to save a last_query_date that's in the past, since the date will keep moving
+    #   forward in any case
+    SAFETY_MARGIN = 60
+
+    if query_date is None:
+        query_date = datetime.now()
+    query_date -= timedelta(minutes=SAFETY_MARGIN)
+    last_query_file = properties.LAST_QUERY
+    try:
+        with open(last_query_file, 'wb') as fp:
+            logger.info('save_last_query_date ' + str(query_date))
+            pickle.dump(query_date, file=fp)
+    except Exception as e:
+        logger.error(e)
+
+
+def clear_last_query_date():
+    last_query_file = properties.LAST_QUERY
+    if os.path.exists(last_query_file):
+        logger.info('clear_last_query_date')
+        os.remove(last_query_file)
+
+
+def get_last_query_date():
+    last_query_file = properties.LAST_QUERY
+    last_query_date = None
+    try:
+        with open(last_query_file, 'rb') as fp:
+            last_query_date = pickle.load(file=fp)
+    except FileNotFoundError as e:
+        pass
+    except Exception as e:
+        logger.error(e)
+    logger.info('get_last_query_date returns ' + str(last_query_date))
+    return last_query_date
+
