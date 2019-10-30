@@ -60,7 +60,7 @@ DEFAULT_RIGHTS_HOLDER = u'CN=PASTA-GMN,O=EDI,ST=New Mexico,C=US'
 #SCOPE = u'edi'
 ##########
 # For LTER MN:
-PASTA_WHITELIST = {'ecotrends', 'knb-lter-and', 'knb-lter-arc', 'knb-lter-bes', 'knb-lter-bnz',
+PASTA_WHITELIST = {'ecotrends', 'knb-lter-and', 'knb-lter-arc', 'knb-lter-bes', 'knb-lter-ble', 'knb-lter-bnz',
                    'knb-lter-cap', 'knb-lter-cce', 'knb-lter-cdr', 'knb-lter-cwt', 'knb-lter-fce',
                    'knb-lter-gce', 'knb-lter-hbr', 'knb-lter-hfr', 'knb-lter-jrn', 'knb-lter-kbs',
                    'knb-lter-knz', 'knb-lter-luq', 'knb-lter-mcm', 'knb-lter-mcr', 'knb-lter-nes',
