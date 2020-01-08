@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+m #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """:Mod: parser
@@ -13,10 +13,6 @@
 """
 
 import logging
-
-logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S%z', level=logging.WARN)
-
 from datetime import datetime
 from datetime import timedelta
 import xml.etree.ElementTree as ET
@@ -29,6 +25,8 @@ import properties
 from queue_manager import QueueManager
 
 
+logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S%z', level=properties.LOG_LEVEL)
 logger = logging.getLogger('poll_manager')
 
 
@@ -40,7 +38,7 @@ def bootstrap(url=None):
 
     while fromDate < now:
         toDate = fromDate + timedelta(minutes=30)
-        logger.warn('from: {f} -- to: {t}'.format(f=str(fromDate), t=str(toDate)))
+        logger.warning('from: {f} -- to: {t}'.format(f=str(fromDate), t=str(toDate)))
         parse(url=url, fromDate=fromDate, toDate=toDate, scope=properties.SCOPE)
         fromDate = toDate
 
@@ -56,6 +54,8 @@ def parse(url=None, fromDate=None, toDate=None, scope=None):
                      query
     :return: 0 if successful, 1 otherwise
     """
+
+    logger.info(f'parse params: url-{url}, fromDate-{fromDate}, toDate-{toDate}, scope-{scope}')
 
     # convert to string representations
     fromDate = datetime.strftime(fromDate, '%Y-%m-%dT%H:%M:%S.%f')
@@ -97,14 +97,14 @@ def parse(url=None, fromDate=None, toDate=None, scope=None):
                 if fromDate.rstrip('0') == date.text:
                     msg = 'Skipping: {} - {} - {}'.format(package.text, date.text,
                                                           method.text)
-                    logger.warn(msg)
+                    logger.warning(msg)
                 else:
                     # Provide additional filter for multiple scope values
                     package_scope = event.package.split('.')[0]
                     if package_scope in properties.PASTA_WHITELIST:
                         msg = 'Enqueue: {} - {} - {}'.format(package.text,
                                                              date.text, method.text)
-                        logger.warn(msg)
+                        logger.warning(msg)
                         qm.enqueue(event=event)
                     else:
                         logger.info('Package {} out of scope'.format(package.text))
@@ -124,12 +124,13 @@ def main():
         return 1
     else:
         lock.acquire()
-        logger.warn('Lock file {} acquired'.format(lock.lock_file))
+        logger.warning('Lock file {} acquired'.format(lock.lock_file))
 
     url = properties.PASTA_BASE_URL + '/changes/eml?'
     qm = QueueManager()
 
     fromDate = qm.get_last_datetime()
+    logger.info(f'"fromDate" from QueueManager: {fromDate}')
 
     if fromDate is None:
         bootstrap(url=url)
@@ -138,10 +139,12 @@ def main():
         last_query_date = adapter_utilities.get_last_query_date()
         if last_query_date is not None:
             fromDate = last_query_date
+            logger.info(f'"fromDate" from adapter_utilities: {fromDate}')
+
         parse(url=url, fromDate=fromDate, scope=properties.SCOPE)
 
     lock.release()
-    logger.warn('Lock file {} released'.format(lock.lock_file))
+    logger.warning('Lock file {} released'.format(lock.lock_file))
     return 0
 
 
