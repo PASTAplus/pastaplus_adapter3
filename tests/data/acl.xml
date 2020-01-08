@@ -1,0 +1,14 @@
+<access:access xmlns:access="eml://ecoinformatics.org/access-2.1.0" authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" system="https://pasta.edirepository.org">
+  <allow>
+    <principal>uid=LNO,o=LTER,dc=ecoinformatics,dc=org</principal>
+    <permission>changePermission</permission>
+  </allow>
+  <allow>
+    <principal>uid=NIN,o=LTER,dc=ecoinformatics,dc=org</principal>
+    <permission>changePermission</permission>
+  </allow>
+  <allow>
+    <principal>public</principal>
+    <permission>read</permission>
+  </allow>
+</access:access>
