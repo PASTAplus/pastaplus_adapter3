@@ -17,6 +17,8 @@ import logging
 
 logger = logging.getLogger('properties.py')
 
+LOG_LEVEL = logging.WARNING
+
 # URLs
 PASTA_BASE_URL = u'https://pasta-s.lternet.edu/package/'
 D1_BASE_URL = u'https://cn-stage.test.dataone.org/cn'
