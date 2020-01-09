@@ -31,12 +31,12 @@ logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
                     # filename='$NAME' + '.log',
                     level=logging.WARN)
 
+
 def _is_stale_file(filename=None, seconds=None):
     is_stale = False
     try:
         mtime = os.path.getmtime(filename=filename)
-        delta = datetime.fromtimestamp(timestamp=mtime) + \
-                timedelta(seconds=seconds)
+        delta = datetime.fromtimestamp(timestamp=mtime) + timedelta(seconds=seconds)
         if delta < datetime.now():
             is_stale = True
     except OSError as e:
