@@ -116,6 +116,7 @@ def parse(url=None, fromDate=None, toDate=None, scope=None):
         # we return without saving a new last_query_date so we can try again on the next pass
         pass
 
+
 def main():
 
     lock = Lock('/tmp/poll_manager.lock')
@@ -135,12 +136,11 @@ def main():
     if fromDate is None:
         bootstrap(url=url)
     else:
-        # if we've got a last_query_date, we'll use that instead of the date of the last queue entry
-        last_query_date = adapter_utilities.get_last_query_date()
-        if last_query_date is not None:
-            fromDate = last_query_date
-            logger.info(f'"fromDate" from adapter_utilities: {fromDate}')
-
+        # # if we've got a last_query_date, we'll use that instead of the date of the last queue entry
+        # last_query_date = adapter_utilities.get_last_query_date()
+        # if last_query_date is not None:
+        #     fromDate = last_query_date
+        #     logger.info(f'"fromDate" from adapter_utilities: {fromDate}')
         parse(url=url, fromDate=fromDate, scope=properties.SCOPE)
 
     lock.release()
