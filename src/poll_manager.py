@@ -136,9 +136,9 @@ def main():
             logger.info(f'"fromDate" from adapter_utilities: {fromDate}')
 
         try:
-            parse(url=url, fromDate=fromDate, scope=properties.SCOPE)
             query_date = pendulum.now(tz='UTC')
-            adapter_utilities.save_last_query_date(query_date)
+            parse(url=url, fromDate=fromDate, scope=properties.SCOPE)
+            adapter_utilities.save_last_query_date(query_date) # Save only if parse is successful
         except AdapterRequestFailureException as e:
             logger.error(e)
 
