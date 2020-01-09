@@ -18,22 +18,21 @@ import logging
 from io import BytesIO
 import time
 
-
-# Set level to WARN to avoid verbosity in requests at INFO
-logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S%z', level=logging.WARN)
-
 import d1_client.cnclient_2_0
 import d1_client.mnclient_2_0
 
 from adapter_exceptions import AdapterIncompleteStateException
 from lock import Lock
-from package import Package
 import properties
+from package import Package
 from queue_manager import QueueManager
 
 
 logger = logging.getLogger('package_manager')
+
+# Set level to WARN to avoid verbosity in requests at INFO
+logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S%z', level=properties.LOG_LEVEL)
 
 
 def create_gmn_client():
@@ -46,7 +45,7 @@ def create_gmn_client():
 
 
 def gmn_create(resource=None):
-    logger.warn('Create: {}'.format(resource.identifier))
+    logger.warning('Create: {}'.format(resource.identifier))
     gmn_client = create_gmn_client()
     try:
         gmn_client.create(pid=resource.identifier,
@@ -59,7 +58,7 @@ def gmn_create(resource=None):
 
 
 def gmn_update(resource=None):
-    logger.warn('Update: {}'.format(resource.identifier))
+    logger.warning('Update: {}'.format(resource.identifier))
     gmn_client = create_gmn_client()
     try:
         gmn_client.update(pid=resource.predecessor,
@@ -73,7 +72,7 @@ def gmn_update(resource=None):
 
 
 def gmn_archive(resource=None):
-    logger.warn('Archive: {}'.format(resource.identifier))
+    logger.warning('Archive: {}'.format(resource.identifier))
     gmn_client = create_gmn_client()
     try:
         gmn_client.archive(pid=resource.identifier)
@@ -152,21 +151,21 @@ def main():
         return 1
     else:
         lock.acquire()
-        logger.warn('Lock file {} acquired'.format(lock.lock_file))
+        logger.warning('Lock file {} acquired'.format(lock.lock_file))
 
     qm = QueueManager()
     head = qm.get_head()
     while head is not None:
-        logger.warn('Active package: {p}'.format(p=head.package))
+        logger.warning('Active package: {p}'.format(p=head.package))
         skip = False
         if properties.CHECK_PRE_EXISTENCE_IN_GMN and head.method in [properties.CREATE, properties.UPDATE]:
             skip = gmn_exists(properties.PASTA_BASE_URL + 'metadata/eml/' + head.package.replace('.', '/'))
         if skip:
-            logger.warn('Package already exists: {}. Skipping {}.'.format(head.package, head.method))
+            logger.warning('Package already exists: {}. Skipping {}.'.format(head.package, head.method))
         else:
             p = Package(head)
             if p.public:
-                logger.warn('Processing: {p}'.format(p=p.package))
+                logger.warning('Processing: {p}'.format(p=p.package))
                 resource = p.resources[properties.METADATA]
                 if p.method == properties.CREATE:
                     process_create_package(package=p)
@@ -180,16 +179,16 @@ def main():
                                                       package=p.package)
                     raise(AdapterIncompleteStateException(msg))
             else:
-                logger.warn('Package not public: {p}'.format(p=p.package))
+                logger.warning('Package not public: {p}'.format(p=p.package))
         
         qm.dequeue(package=head.package, method=head.method)
         if properties.SLEEP_BETWEEN_PACKAGES:
             time.sleep(int(properties.SLEEP_BETWEEN_PACKAGES))
         head = qm.get_head()
 
-    logger.warn('Queue empty')
+    logger.warning('Queue empty')
     lock.release()
-    logger.warn('Lock file {} released'.format(lock.lock_file))
+    logger.warning('Lock file {} released'.format(lock.lock_file))
     return 0
 
 
