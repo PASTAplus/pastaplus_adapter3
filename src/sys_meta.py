@@ -38,13 +38,22 @@ class SysMeta(object):
         self._size = None
 
     def _assert_complete_sys_meta(self):
-        if self._checksum_algorithm is None or \
-           self._checksum_value is None or \
-           self._format_identifier is None or \
-           self._identifier is None or \
-           self._rights_holder is None or \
-           self._size is None:
-            msg = 'One or more required metadata attribute(s) is missing'
+        msg = list()
+        if self._checksum_algorithm is None:
+            msg.append('checksum algorithm')
+        if self._checksum_value is None:
+            msg.append('checksum value')
+        if self._format_identifier is None:
+            msg.append('format identifier')
+        if self._identifier is None:
+            msg.append('identifier')
+        if self._rights_holder is None:
+            msg.append('rights holder')
+        if self._size is None:
+            msg.append('size')
+        if len(msg) > 0:
+            msg = ', '.join([_ for _ in msg])
+            msg = 'One or more of the following system metadata attribute(s) is missing: ' + msg
             raise(AdapterIncompleteStateException(msg))
 
     @property
