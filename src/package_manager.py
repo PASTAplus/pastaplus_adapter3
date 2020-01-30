@@ -55,6 +55,7 @@ def gmn_create(resource=None):
     except Exception as e:
         logger.debug('gmn_create exception - pid={} object={}'.format(resource.identifier, resource.object))
         logger.error(e)
+        raise
 
 
 def gmn_update(resource=None):
@@ -69,6 +70,7 @@ def gmn_update(resource=None):
         pass
     except Exception as e:
         logger.error(e)
+        raise
 
 
 def gmn_archive(resource=None):
@@ -78,6 +80,7 @@ def gmn_archive(resource=None):
         gmn_client.archive(pid=resource.identifier)
     except Exception as e:
         logger.error(e)
+        raise
 
 
 def gmn_exists(pid=None):
