@@ -56,7 +56,9 @@ def parse(url=None, fromDate=None, toDate=None, scope=None):
     :return: 0 if successful, 1 otherwise
     """
 
-    logger.info(f'parse params: url-{url}, fromDate-{fromDate}, toDate-{toDate}, scope-{scope}')
+    msg = f'parse params: url-{url}, fromDate-{fromDate}, toDate-{toDate},' + \
+          f' scope-{scope}'
+    logger.info(msg) 
 
     # convert to string representations
     fromDate = datetime.strftime(fromDate, '%Y-%m-%dT%H:%M:%S.%f')
@@ -108,7 +110,6 @@ def parse(url=None, fromDate=None, toDate=None, scope=None):
                     logger.info('Package {} out of scope'.format(package.text))
 
 
-
 def main():
 
     lock = Lock('/tmp/poll_manager.lock')
@@ -122,6 +123,7 @@ def main():
     url = properties.PASTA_BASE_URL + 'changes/eml?'
     qm = QueueManager()
 
+    # queue fromDate (fallback): effective but not efficient
     fromDate = qm.get_last_datetime()
     logger.info(f'"fromDate" from QueueManager: {fromDate}')
 
@@ -129,16 +131,16 @@ def main():
         bootstrap(url=url)
     else:
         fromDate = pendulum.instance(dt=fromDate, tz='US/Mountain')
-        # if we've got a last_query_date, we'll use that instead of the date of the last queue entry
         last_query_date = adapter_utilities.get_last_query_date()
         if last_query_date is not None:
+            # pickled fromDate: effective and efficient
             fromDate = last_query_date.in_tz('US/Mountain')
             logger.info(f'"fromDate" from adapter_utilities: {fromDate}')
 
         try:
             query_date = pendulum.now(tz='UTC')
             parse(url=url, fromDate=fromDate, scope=properties.SCOPE)
-            adapter_utilities.save_last_query_date(query_date) # Save only if parse is successful
+            adapter_utilities.save_last_query_date(query_date)
         except AdapterRequestFailureException as e:
             logger.error(e)
 
