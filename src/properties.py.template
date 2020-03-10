@@ -84,6 +84,14 @@ LAST_QUERY = u'last_query.pkl'
 # Polling from/to dates
 FROM_DATE = u'2013-01-01T00:00:00.00'
 
+# PASTA database connection
+DB_USER = 'DB_USER'
+DB_PW = 'SECRET_PASSWORD'
+DB_HOST = 'PASTA_DB_HOST_AND_PORT'
+DB_DB = 'pasta'
+DB_DRIVER = 'postgres+psycopg2'
+
+
 def main():
     return 0
 
