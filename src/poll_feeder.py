@@ -2,23 +2,31 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import os
 import sys
-import time
+
+import click
+import daiquiri
+from sqlalchemy import create_engine
 
 from adapter_exceptions import AdapterRequestFailureException
-import click
 from event import Event
 from lock import Lock
 import properties
 from queue_manager import QueueManager
-from sqlalchemy import create_engine
+
+
+cwd = os.path.dirname(os.path.realpath(__file__))
+logfile = cwd + "/poll_feeder.log"
+daiquiri.setup(level=logging.INFO,
+               outputs=(daiquiri.output.File(logfile), "stdout",))
+logger = daiquiri.getLogger(__name__)
 
 
 @click.command()
 @click.argument("package_id")
-def poll_feeder(
-    package_id: str
-):
+@click.option('-d', '--dryrun', default=False, is_flag=True)
+def poll_feeder(package_id: str, dryrun: bool):
     """
     Given a package ID in the form scope.identifier.revision (e.g., edi.1.1),
     queries the PASTA database to get the package's details and creates an event
@@ -26,17 +34,11 @@ def poll_feeder(
     processed in due course by the package_manager.
     """
 
-    # Check the Python version
     if sys.version_info < (3, 6):
         print("Requires Python 3.6 or later")
         exit(0)
 
-    main(package_id)
-
-
-logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S%z', level=properties.LOG_LEVEL)
-logger = logging.getLogger('poll_feeder')
+    main(package_id, dryrun)
 
 
 def connect():
@@ -52,15 +54,19 @@ def connect():
 
 def get_package_info(connection, scope, identifier, target_revision):
     """
-    Query PASTA for package info and return an Event object for insertion into the poll_manager queue.
+    Query PASTA for package info and return an Event object for insertion into
+    the poll_manager queue.
     """
-    sql = (f'''select scope, identifier, revision, doi, principal_owner, date_created from datapackagemanager.resource_registry 
-               where resource_type='dataPackage' and scope='{scope}' and identifier='{identifier}' order by scope, identifier, revision''')
+    sql = f"select scope, identifier, revision, doi, principal_owner, " + \
+          f"date_created from datapackagemanager.resource_registry where " + \
+          f"resource_type='dataPackage' and scope='{scope}' and " + \
+          f"identifier='{identifier}' order by scope, identifier, revision"
     logger.info(sql)
     result_set = connection.execute(sql).fetchall()
     revisions = []
     event = None
-    for scope, identifier, revision, doi, principal_owner, date_created in result_set:
+    for scope, identifier, revision, doi, principal_owner, date_created in \
+            result_set:
         revisions.append(revision)
         if revision == int(target_revision):
             event = Event()
@@ -76,7 +82,7 @@ def get_package_info(connection, scope, identifier, target_revision):
     return event
 
 
-def main(package_id=None):
+def main(package_id, dryrun):
     logger.info(f'package_id={package_id}')
 
     lock = Lock('/tmp/poll_manager.lock')
@@ -96,9 +102,14 @@ def main(package_id=None):
         if event:
             qm = QueueManager()
 
-            msg = f'Enqueue: {event.package} - {event.datetime} - {event.owner} - {event.doi} - {event.method}'
+            msg = f"Enqueue: {event.package} - {event.datetime} - " + \
+                  f"{event.owner} - {event.doi} - {event.method}"
             logger.warning(msg)
-            qm.enqueue(event=event)
+            if not dryrun:
+                qm.enqueue(event=event)
+            else:
+                msg = f"DRYRUN: qm.enqueue(event=event)"
+                logger.info(msg)
 
     except AdapterRequestFailureException as e:
         logger.error(e)
@@ -110,4 +121,3 @@ def main(package_id=None):
 
 if __name__ == "__main__":
     poll_feeder()
-
