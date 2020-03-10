@@ -4,7 +4,9 @@ attrs==19.3.0
 certifi==2019.11.28
 cffi==1.13.2
 chardet==3.0.4
+Click==7.0
 cryptography==2.8
+daiquiri==2.1.1
 dataone.common==3.4.7
 dataone.libclient==3.4.7
 idna==2.8
@@ -17,6 +19,7 @@ multidict==4.7.3
 packaging==20.0
 pendulum==2.0.5
 pluggy==0.13.1
+psycopg2==2.8.4
 py==1.8.1
 pyasn1==0.4.8
 pycparser==2.19
@@ -25,6 +28,7 @@ pyOpenSSL==19.1.0
 pyparsing==2.4.6
 pytest==5.3.2
 python-dateutil==2.8.1
+python-json-logger==0.1.11
 pytz==2019.3
 pytzdata==2019.3
 PyXB==1.2.6
