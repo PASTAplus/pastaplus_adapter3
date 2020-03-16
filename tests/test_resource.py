@@ -57,8 +57,9 @@ class TestResource(unittest.TestCase):
         pass
 
     def testResourceMetadata(self):
-        rm = ResourceMetadata(url=TestResource.metadata_resource,
-                              owner=TestResource.owner)
+        rm = ResourceMetadata(TestResource.metadata_resource,
+                              TestResource.owner,
+                              TestResource.package_str)
         self.assertIsNotNone(rm)
 
     def testResourceOre(self):
@@ -71,13 +72,17 @@ class TestResource(unittest.TestCase):
                      properties.ORE: '',
                      properties.DATA: [rd]}
 
-        ro = ResourceOre(doi=TestResource.doi, owner=TestResource.owner, resources=resources)
+        ro = ResourceOre(TestResource.doi,
+                         TestResource.owner,
+                         resources,
+                         TestResource.package_str)
         sm = ro.get_d1_sys_meta()
         self.assertIsNotNone(ro)
 
     def test_build_system_metadata(self):
-        rm = ResourceMetadata(url=TestResource.metadata_resource,
-                              owner=TestResource.owner)
+        rm = ResourceMetadata(TestResource.metadata_resource,
+                              TestResource.owner,
+                              TestResource.package_str)
         sm = rm.get_d1_sys_meta()
         self.assertIsNotNone(sm)
 
