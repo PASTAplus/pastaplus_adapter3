@@ -43,6 +43,8 @@ class SysMeta(object):
             msg.append('checksum algorithm')
         if self._checksum_value is None:
             msg.append('checksum value')
+        if self._file_name is None:
+            msg.append('filename value')
         if self._format_identifier is None:
             msg.append('format identifier')
         if self._identifier is None:
@@ -53,7 +55,10 @@ class SysMeta(object):
             msg.append('size')
         if len(msg) > 0:
             msg = ', '.join([_ for _ in msg])
-            msg = 'One or more of the following system metadata attribute(s) is missing: ' + msg
+            msg = (
+                f'One or more of the following system metadata attribute(s) '
+                f'is missing: {msg}'
+            )
             raise(AdapterIncompleteStateException(msg))
 
     @property

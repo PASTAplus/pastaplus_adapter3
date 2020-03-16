@@ -32,8 +32,8 @@ logger = logging.getLogger('resource')
 
 class ResourceBase(object):
 
-    def __init__(self, url=None, owner=None):
-        logger.info('Building resource: {r}'.format(r=url))
+    def __init__(self, url, owner):
+        logger.info(f'Building resource: {url}')
         self._acl = None
         self._checksum_value = None
         self._checksum_algorithm = None
@@ -43,6 +43,7 @@ class ResourceBase(object):
         self._identifier = url
         self._object = None
         self._owner = owner
+        self._package_id = None
         self._predecessor = None
         self._replication_policy = None
         self._rights_holder = properties.DEFAULT_RIGHTS_HOLDER
@@ -120,6 +121,7 @@ class ResourceBase(object):
         sm.access_policy = self._acl
         sm.checksum_algorithm = self._checksum_algorithm
         sm.checksum_value = self._checksum_value
+        sm.file_name = self._file_name
         sm.format_identifier = self._format_identifier
         sm.identifier = self._identifier
         sm.replication_policy = self._replication_policy
@@ -151,12 +153,13 @@ class ResourceBase(object):
 
 class ResourceMetadata(ResourceBase):
 
-    def __init__(self, url=None, owner=None):
+    def __init__(self, url, owner, package_id):
         super(ResourceMetadata,self).__init__(url, owner)
         self._acl = self._get_acl('/metadata/eml/', '/metadata/acl/eml/')
         self._checksum_value = \
             self._get_checksum_value('/metadata/eml/', '/metadata/checksum/eml/')
         self._checksum_algorithm = properties.CHECKSUM_ALGORITHM
+        self._file_name = f"{package_id}.xml"
         self._format_identifier = self._get_format_id()
         self._size = self._get_size()
         self._vendor_specific_header = {'VENDOR-GMN-REMOTE-URL': url}
@@ -192,12 +195,13 @@ class ResourceMetadata(ResourceBase):
 
 class ResourceReport(ResourceBase):
 
-    def __init__(self, url=None, owner=None):
+    def __init__(self, url, owner, package_id):
         super(ResourceReport,self).__init__(url, owner)
         self._acl = self._get_acl('/report/eml/', '/report/acl/eml/')
         self._checksum_value = \
             self._get_checksum_value('/report/eml/', '/report/checksum/eml/')
         self._checksum_algorithm = properties.CHECKSUM_ALGORITHM
+        self._file_name = f"{package_id}-report.xml"
         self._format_identifier = 'text/xml'
         self._size = self._get_size()
         self._vendor_specific_header = {'VENDOR-GMN-REMOTE-URL': url}
@@ -212,15 +216,28 @@ class ResourceReport(ResourceBase):
 
 class ResourceData(ResourceBase):
 
-    def __init__(self, url=None, owner=None):
+    def __init__(self, url, owner):
         super(ResourceData,self).__init__(url, owner)
         self._acl = self._get_acl('/data/eml/', '/data/acl/eml/')
         self._checksum_value = \
             self._get_checksum_value('/data/eml/', '/data/checksum/eml/')
         self._checksum_algorithm = properties.CHECKSUM_ALGORITHM
+        self._file_name = self._get_file_name()
         self._format_identifier = self._get_format_id()
         self._size = self._get_size()
         self._vendor_specific_header = {'VENDOR-GMN-REMOTE-URL': url}
+
+    def _get_file_name(self):
+        file_name = None
+        url = self._url.replace('/data/eml', '/data/rmd/eml')
+        r = adapter_utilities.requests_get_url_wrapper(url=url)
+        if r is not None:
+            rmd = r.text.strip()
+        if rmd is not None:
+            tree = ET.ElementTree(ET.fromstring(rmd))
+            _ = tree.find(".//fileName")
+            file_name = _.text
+        return file_name
 
     def _get_format_id(self):
         d1_formats = adapter_utilities.get_d1_formats()
@@ -248,11 +265,12 @@ class ResourceData(ResourceBase):
 
 class ResourceOre(ResourceBase):
 
-    def __init__(self, doi=None, owner=None, resources=None):
+    def __init__(self, doi, owner, resources, package_id):
         super(ResourceOre,self).__init__(doi, owner)
         ore_xml = _build_ore(pid=doi, resources=resources)
         self._checksum_algorithm = 'SHA-1'
         self._checksum_value = hashlib.sha1(ore_xml).hexdigest()
+        self._file_name = f"{package_id}-ore.xml"
         self._format_identifier = 'http://www.openarchives.org/ore/terms'
         self._object = ore_xml
         self._resources = None

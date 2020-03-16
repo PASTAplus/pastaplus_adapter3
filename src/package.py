@@ -40,8 +40,8 @@ class Package(object):
         self._package = event.package.strip()
         self._scope, self._identifier, self._revision = self._package.split('.')
         self._package_path = self._package.replace('.', '/')
-        self._resources = _build_resource_list(self.eml_url, self.package_url, self._owner,
-                                               self._doi)
+        self._resources = _build_resource_list(self.eml_url, self.package_url,
+            self._owner, self._doi, self._package)
         self._public = _assert_package_is_public(self._resources)
 
     @property
@@ -158,7 +158,8 @@ def _generate_replication_policy(d1_replication_policy):
     )
 
 
-def _build_resource_list(eml_url, package_map_url, principal_owner, doi):
+def _build_resource_list(eml_url, package_map_url, principal_owner, doi,
+                         package_id):
     """
     Return a dict of data package resources without the reflexive package
     resource.
@@ -182,20 +183,20 @@ def _build_resource_list(eml_url, package_map_url, principal_owner, doi):
     resource_urls = r.text.split()
     for resource_url in resource_urls:
         if properties.METADATA_PATTERN in resource_url:
-            rm = ResourceMetadata(url=resource_url, owner=principal_owner)
+            rm = ResourceMetadata(resource_url, principal_owner, package_id)
             rm.replication_policy = replication_policy
             resources[properties.METADATA] = rm
             package_acl = rm.acl
         elif properties.REPORT_PATTERN in resource_url:
-            rr = ResourceReport(url=resource_url, owner=principal_owner)
+            rr = ResourceReport(resource_url, principal_owner, package_id)
             rr.replication_policy = replication_policy
             resources[properties.REPORT] = rr
         elif properties.DATA_PATTERN in resource_url:
-            rd = ResourceData(url=resource_url, owner=principal_owner)
+            rd = ResourceData(resource_url, principal_owner)
             rd.replication_policy = replication_policy
             resources[properties.DATA].append(rd)
 
-    ro = ResourceOre(doi=doi, owner=principal_owner, resources=resources)
+    ro = ResourceOre(doi, principal_owner, resources, package_id)
     ro.acl = package_acl # Assign ORE same ACL as metadata/package ACL
     ro.replication_policy = replication_policy
     resources[properties.ORE] = ro
