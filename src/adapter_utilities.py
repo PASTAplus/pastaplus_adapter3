@@ -11,25 +11,21 @@
 :Created:
     3/8/17
 """
-
-import logging
 import pickle
 import os
 import os.path
 from datetime import datetime
 from datetime import timedelta
 
+import daiquiri
 import d1_client.cnclient_2_0
 import requests
 
 import properties
 from adapter_exceptions import AdapterRequestFailureException
 
-logger = logging.getLogger('adapter_utilities')
-logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S%z',
-                    # filename='$NAME' + '.log',
-                    level=logging.WARN)
+
+logger = daiquiri.getLogger(__name__)
 
 
 def _is_stale_file(filename=None, seconds=None):

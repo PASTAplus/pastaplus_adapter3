@@ -13,13 +13,12 @@
 :Created:
     3/2/17
 """
-
-import logging
 import xml.etree.ElementTree as ET
+
+import daiquiri
 import d1_common.types
 import d1_common.xml
 
-from adapter_exceptions import AdapterIncompleteStateException
 import adapter_utilities
 import properties
 from resource import ResourceData
@@ -27,7 +26,8 @@ from resource import ResourceMetadata
 from resource import ResourceOre
 from resource import ResourceReport
 
-logger = logging.getLogger('package')
+
+logger = daiquiri.getLogger(__name__)
 
 
 class Package(object):

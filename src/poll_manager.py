@@ -15,8 +15,10 @@
 import logging
 from datetime import datetime
 from datetime import timedelta
+import os
 import xml.etree.ElementTree as ET
 
+import daiquiri
 import pendulum
 
 from adapter_exceptions import AdapterRequestFailureException
@@ -27,9 +29,11 @@ import properties
 from queue_manager import QueueManager
 
 
-logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S%z', level=properties.LOG_LEVEL)
-logger = logging.getLogger('poll_manager')
+cwd = os.path.dirname(os.path.realpath(__file__))
+logfile = cwd + "/poll_manager.log"
+daiquiri.setup(level=logging.INFO,
+               outputs=(daiquiri.output.File(logfile), "stdout",))
+logger = daiquiri.getLogger(__name__)
 
 
 def bootstrap(url=None):

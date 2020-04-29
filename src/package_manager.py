@@ -13,11 +13,12 @@ from __future__ import print_function
 :Created:
     3/8/17
 """
-
 import logging
 from io import BytesIO
+import os
 import time
 
+import daiquiri
 import d1_client.cnclient_2_0
 import d1_client.mnclient_2_0
 
@@ -28,11 +29,11 @@ from package import Package
 from queue_manager import QueueManager
 
 
-logger = logging.getLogger('package_manager')
-
-# Set level to WARN to avoid verbosity in requests at INFO
-logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S%z', level=properties.LOG_LEVEL)
+cwd = os.path.dirname(os.path.realpath(__file__))
+logfile = cwd + "/package_manager.log"
+daiquiri.setup(level=logging.INFO,
+               outputs=(daiquiri.output.File(logfile), "stdout",))
+logger = daiquiri.getLogger(__name__)
 
 
 def create_gmn_client():

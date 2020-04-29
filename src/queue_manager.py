@@ -13,11 +13,9 @@
 :Created:
     3/2/17
 """
-
 import os
-import logging
-from datetime import datetime
 
+import daiquiri
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -27,10 +25,10 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
-from package import Package
 import properties
 
-logger = logging.getLogger('adapter_db')
+
+logger = daiquiri.getLogger(__name__)
 
 Base = declarative_base()
 
