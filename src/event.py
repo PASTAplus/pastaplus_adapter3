@@ -13,11 +13,13 @@
 :Created:
     8/8/17
 """
-
 from datetime import datetime
 import logging
 
-logger = logging.getLogger('event')
+import daiquiri
+
+
+logger = daiquiri.getLogger(__name__)
 
 
 class Event(object):
