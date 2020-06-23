@@ -11,11 +11,12 @@
 :Created:
     3/8/17
 """
-import pickle
-import os
-import os.path
 from datetime import datetime
 from datetime import timedelta
+import os
+import os.path
+import pickle
+import time
 
 import daiquiri
 import d1_client.cnclient_2_0
@@ -91,6 +92,7 @@ def requests_get_url_wrapper(url=None, auth=None, rethrow=False):
         logger.error(e)
         if rethrow:
             raise AdapterRequestFailureException
+    time.sleep(2.0)
     return r
 
 
