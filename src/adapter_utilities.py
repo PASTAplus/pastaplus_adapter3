@@ -92,7 +92,6 @@ def requests_get_url_wrapper(url=None, auth=None, rethrow=False):
         logger.error(e)
         if rethrow:
             raise AdapterRequestFailureException
-    time.sleep(2.0)
     return r
 
 
