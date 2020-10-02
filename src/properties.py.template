@@ -25,7 +25,7 @@ D1_BASE_URL = u'https://cn-stage.test.dataone.org/cn'
 GMN_BASE_URL = u'https://gmn-s.edirepository.org/mn'
 
 # Credentials
-GMN_USER = u'uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org'
+GMN_USER = u'uid=gmn-pasta,o=EDI,dc=edirepository,dc=org'
 GMN_PASSWD = u'SECRET_PASSWORD'
 GMN_CERT_PATH = u'GMN_CERT_PATH'
 GMN_KEY_PATH = u'GMN_KEY_PATH'
