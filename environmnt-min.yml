@@ -1,0 +1,16 @@
+name: adapter
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - psycopg2
+  - click
+  - pendulum
+  - sqlalchemy
+  - cryptography
+  - pytest
+  - python=3.8
+  - daiquiri
+  - lxml
+  - pytz
+prefix: /home/servilla/anaconda3/envs/adapter
