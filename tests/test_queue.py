@@ -45,19 +45,19 @@ class TestAdapterQueue(unittest.TestCase):
         e.owner = 'uid=SBC,o=LTER,dc=ecoinformatics,dc=org'
         e.doi = 'doi:10.5072/FK2/381addd8bfda02f8ba85329df8f903dc'
         self.qm.enqueue(event=e)
-        self.assertEquals(self.qm.get_count(),1)
+        self.assertEqual(self.qm.get_count(),1)
 
     def test_get_head(self):
         self.enqueue_all()
         e = self.qm.get_head()
-        self.assertEquals(e.package, self.events[0].package)
+        self.assertEqual(e.package, self.events[0].package)
 
     def test_dequeue(self):
         self.enqueue_all()
         e = self.qm.get_head()
         self.qm.dequeue(package=e.package, method=e.method)
         e = self.qm.get_head()
-        self.assertEquals(e.package, self.events[1].package)
+        self.assertEqual(e.package, self.events[1].package)
 
     def test_get_last_datetime(self):
         self.enqueue_all()
