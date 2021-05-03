@@ -80,7 +80,7 @@ def make_https(url=None):
     return url.replace('http:', 'https:', 1)
 
 
-def requests_get_url_wrapper(url=None, auth=None, rethrow=False):
+def requests_get_url_wrapper(url=None, auth=None, rethrow=True):
     r = None
     try:
         r = requests.get(url=url, auth=auth)
