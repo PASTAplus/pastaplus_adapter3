@@ -13,20 +13,16 @@ from __future__ import print_function
 :Created:
     3/10/17
 """
-
 import logging
-
-logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S%z', level=logging.INFO)
-
 import unittest
 from datetime import datetime
 
 import properties
 from resource import ResourceMetadata
 from resource import ResourceOre
-from resource import ResourceReport
-from resource import ResourceData
+
+logging.basicConfig(format='%(asctime)s %(levelname)s (%(name)s): %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S%z', level=logging.INFO)
 
 logger = logging.getLogger('test_resource')
 
