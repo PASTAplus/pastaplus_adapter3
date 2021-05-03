@@ -93,7 +93,6 @@ class ResourceBase(object):
                         'permission': 'changePermission'})
         return acl
 
-
     @property
     def acl(self):
         return self._acl
