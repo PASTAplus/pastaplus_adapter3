@@ -6,12 +6,38 @@ dependencies:
   - psycopg2
   - click
   - pendulum
-  - sqlalchemy
+  - sqlalchemy=1.4.46
   - cryptography
   - pytest
-  - python=3.8
+  - python=3.11
   - daiquiri
   - lxml
   - pytz
-  - urllib3=1.26.5
+#  - urllib3=1.26.5
+  - urllib3
+  - aiohttp
+  - aiosignal
+  - async-timeout
+  - attrs
+  - certifi
+  - charset-normalizer
+  - frozenlist
+  - idna
+  - iso8601
+  - isodate
+  - multidict
+  - pyjwt
+  - pyparsing
+  - rdflib
+  - requests
+  - requests-toolbelt
+  - yarl
+  - pip
+  - pip:
+    - dataone-common
+    - dataone-libclient
+    - pyxb-x
+    - pyasn1
+    - zipstream
+
 prefix: /home/servilla/anaconda3/envs/adapter
