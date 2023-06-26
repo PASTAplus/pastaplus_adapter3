@@ -11,44 +11,26 @@
 :Created:
     3/31/17
 """
+import pathlib
 
-import logging
-
-logger = logging.getLogger('test_lock')
-
-import unittest
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath('../src'))
+import daiquiri
+import pytest
 
 from lock import Lock
 
 
-class TestLock(unittest.TestCase):
-
-    def setUp(self):
-        self.lock = Lock('bozo.lock')
-
-    def tearDown(self):
-        try:
-            self.lock.release()
-        except IOError as e:
-            logger.error(e)
-
-    def test_acquire_release(self):
-        print(self.lock.acquire())
-        try:
-            self.lock.release()
-        except IOError as e:
-            logger.error(e)
-            self.fail()
-        self.lock.acquire()
-
-    def test_locked(self):
-        self.lock.acquire()
-        self.assertTrue(self.lock.locked)
+logger = daiquiri.getLogger(__name__)
+LOCK_FILE = "bozo.lock"
 
 
-if __name__ == '__main__':
-    unittest.main()
+@pytest.fixture()
+def lock():
+    return Lock(LOCK_FILE)
+
+
+def test_acquire_release(lock):
+    lock.acquire()
+    assert pathlib.Path(LOCK_FILE).exists()
+
+    lock.release()
+    assert not pathlib.Path(LOCK_FILE).exists()
