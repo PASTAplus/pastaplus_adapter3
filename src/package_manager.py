@@ -19,6 +19,7 @@ import os
 import time
 
 import daiquiri
+import d1_common
 import d1_client.cnclient_2_0
 import d1_client.mnclient_2_0
 
@@ -53,6 +54,8 @@ def gmn_create(resource=None):
                           obj=BytesIO(resource.object),
                           sysmeta_pyxb=resource.get_d1_sys_meta(),
                           vendorSpecific=resource.vendor_specific_header)
+    except d1_common.types.exceptions.IdentifierNotUnique:
+        pass
     except Exception as e:
         logger.debug('gmn_create exception - pid={} object={}'.format(resource.identifier, resource.object))
         logger.error(e)
@@ -68,6 +71,7 @@ def gmn_update(resource=None):
                           newPid = resource.identifier,
                           sysmeta_pyxb=resource.get_d1_sys_meta(),
                           vendorSpecific=resource.vendor_specific_header)
+    except d1_common.types.exceptions.IdentifierNotUnique:
         pass
     except Exception as e:
         logger.error(e)
@@ -170,7 +174,6 @@ def main():
             p = Package(head)
             if p.public:
                 logger.warning('Processing: {p}'.format(p=p.package))
-                resource = p.resources[properties.METADATA]
                 if p.method == properties.CREATE:
                     process_create_package(package=p)
                 elif p.method == properties.UPDATE:
