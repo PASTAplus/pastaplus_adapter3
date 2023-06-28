@@ -32,6 +32,7 @@ dependencies:
   - requests
   - requests-toolbelt
   - yarl
+  - sqlite
   - pip
   - pip:
     - dataone-common
