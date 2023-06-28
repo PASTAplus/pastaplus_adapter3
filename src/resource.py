@@ -295,4 +295,4 @@ def _build_ore(pid=None, resources=None):
     ore.initialize(pid=pid)
     ore.addMetadataDocument(pid=resources[properties.METADATA].identifier)
     ore.addDataDocuments(scidata_pid_list=data, scimeta_pid=resources[properties.METADATA].identifier)
-    return bytes(ore.serialize(), "utf-8")
+    return ore.serialize(format="xml").encode("utf-8")
