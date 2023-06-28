@@ -268,7 +268,7 @@ class ResourceOre(ResourceBase):
         super(ResourceOre,self).__init__(doi, owner)
         ore_xml = _build_ore(pid=doi, resources=resources)
         self._checksum_algorithm = 'SHA-1'
-        self._checksum_value = hashlib.sha1(ore_xml.encode("utf-8")).hexdigest()
+        self._checksum_value = hashlib.sha1(ore_xml).hexdigest()
         self._file_name = f"{package_id}-ore.xml"
         self._format_identifier = 'http://www.openarchives.org/ore/terms'
         self._object = ore_xml
@@ -295,4 +295,4 @@ def _build_ore(pid=None, resources=None):
     ore.initialize(pid=pid)
     ore.addMetadataDocument(pid=resources[properties.METADATA].identifier)
     ore.addDataDocuments(scidata_pid_list=data, scimeta_pid=resources[properties.METADATA].identifier)
-    return ore.serialize()
+    return bytes(ore.serialize(), "utf-8")
