@@ -55,6 +55,7 @@ def gmn_create(resource=None):
                           sysmeta_pyxb=resource.get_d1_sys_meta(),
                           vendorSpecific=resource.vendor_specific_header)
     except d1_common.types.exceptions.IdentifierNotUnique:
+        logger.warn("Ignoring IdentifierNotUnique exception")
         pass
     except Exception as e:
         logger.debug('gmn_create exception - pid={} object={}'.format(resource.identifier, resource.object))
@@ -72,6 +73,7 @@ def gmn_update(resource=None):
                           sysmeta_pyxb=resource.get_d1_sys_meta(),
                           vendorSpecific=resource.vendor_specific_header)
     except d1_common.types.exceptions.IdentifierNotUnique:
+        logger.warn("Ignoring IdentifierNotUnique exception")
         pass
     except Exception as e:
         logger.error(e)
