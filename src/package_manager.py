@@ -72,6 +72,9 @@ def gmn_update(resource=None):
                           newPid = resource.identifier,
                           sysmeta_pyxb=resource.get_d1_sys_meta(),
                           vendorSpecific=resource.vendor_specific_header)
+    except d1_common.types.exceptions.InvalidRequest:
+        logger.warn("Ignoring InvalidRequest exception")
+        pass
     except d1_common.types.exceptions.IdentifierNotUnique:
         logger.warn("Ignoring IdentifierNotUnique exception")
         pass
