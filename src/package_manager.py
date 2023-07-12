@@ -57,6 +57,13 @@ def gmn_create(resource=None):
     except d1_common.types.exceptions.IdentifierNotUnique:
         logger.warn("Ignoring IdentifierNotUnique exception")
         pass
+    except d1_common.types.exceptions.InvalidRequest as e:
+        if "Object cannot be updated because the identifier for the object to be updated is a" in e.description:
+            logger.warn("Ignoring InvalidRequest exception")
+            pass
+        else:
+            logger.error(e)
+            raise
     except Exception as e:
         logger.debug('gmn_create exception - pid={} object={}'.format(resource.identifier, resource.object))
         logger.error(e)
@@ -75,6 +82,13 @@ def gmn_update(resource=None):
     except d1_common.types.exceptions.IdentifierNotUnique:
         logger.warn("Ignoring IdentifierNotUnique exception")
         pass
+    except d1_common.types.exceptions.InvalidRequest as e:
+        if "Object cannot be updated because the identifier for the object to be updated is a" in e.description:
+            logger.warn("Ignoring InvalidRequest exception")
+            pass
+        else:
+            logger.error(e)
+            raise
     except Exception as e:
         logger.error(e)
         raise
