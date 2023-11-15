@@ -99,6 +99,13 @@ def gmn_archive(resource=None):
     gmn_client = create_gmn_client()
     try:
         gmn_client.archive(pid=resource.identifier)
+    except d1_common.types.exceptions.InvalidRequest as e:
+        if "The object has been archived and cannot be updated." in e.description:
+            logger.warn("Ignoring InvalidRequest exception")
+            pass
+        else:
+            logger.error(e)
+            raise
     except d1_common.types.exceptions.NotFound as e:
         logger.error(e)
         pass
