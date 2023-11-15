@@ -99,6 +99,9 @@ def gmn_archive(resource=None):
     gmn_client = create_gmn_client()
     try:
         gmn_client.archive(pid=resource.identifier)
+    except d1_common.types.exceptions.NotFound as e:
+        logger.error(e)
+        pass
     except Exception as e:
         logger.error(e)
         raise
