@@ -5,7 +5,7 @@ channels:
 dependencies:
   - psycopg2
   - click
-  - pendulum
+  - pendulum=2.1.2
   - sqlalchemy=1.4.46
   - cryptography
   - pytest
