@@ -4,7 +4,7 @@ channels:
   - defaults
 dependencies:
   - psycopg2
-  - click
+# - click
   - pendulum=2.1.2
   - sqlalchemy=1.4.46
   - cryptography
@@ -32,6 +32,7 @@ dependencies:
   - requests-toolbelt
   - yarl
   - sqlite
+  - pyasn1
   - pip
   - pip:
     - dataone-common
