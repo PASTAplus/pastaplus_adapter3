@@ -125,12 +125,13 @@ def _assert_resource_is_public(resource_url):
     :param resource_url: The resource URL
     :return: Boolean
     """
-    public = False
+    is_public = True
     url = properties.PASTA_BASE_URL + 'authz?resourceId=' + resource_url
-    r = adapter_utilities.requests_get_url_wrapper(url=url)
-    if r is not None:
-        public = True
-    return public
+    auth = (properties.GMN_USER, properties.GMN_PASSWD)
+    r = adapter_utilities.requests_get_url_wrapper(url=url, auth=auth)
+    if r is None:
+        is_public = False
+    return is_public
 
 
 def _get_replication_policy(eml_url=None):
