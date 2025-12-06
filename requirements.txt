@@ -50,7 +50,7 @@ six==1.17.0
 SQLAlchemy==1.4.46
 tomli==2.3.0
 typing_extensions==4.15.0
-urllib3==2.5.0
+urllib3==2.6.0
 wheel==0.45.1
 yarl==1.22.0
 zipstream==1.1.4
