@@ -52,6 +52,6 @@ SQLAlchemy==1.4.46
 tomli==2.4.0
 typing_extensions==4.15.0
 urllib3==2.6.3
-wheel==0.45.1
+wheel==0.46.2
 yarl==1.22.0
 zipstream==1.1.4
